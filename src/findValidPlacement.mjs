@@ -20,6 +20,7 @@ function canPlaceLetter(grid, position, letter) {
         return false;
     }
 
+    // If the cell doesn't exist, the letter doesn't fit
     if (grid[y][x] === undefined) {
         return false;
     }
@@ -33,6 +34,9 @@ function canPlaceLetter(grid, position, letter) {
     if (grid[y][x] === letter) {
         return true;
     }
+
+    // Otherwise, we can't place the letter
+    return false;
 }
 
 function canPlaceWord(grid, position, direction, word) {
@@ -57,17 +61,27 @@ function getValidDirections(grid, position, word) {
 }
 
 export function findValidPlacement(grid, word) {
+    // Get the size of the grid
+    const sizeY = grid.length;
+    const sizeX = grid[0].length;
+
     // Select random offset to start iterating from
-    const offsetX = Math.floor(Math.random() * grid[0].length);
-    const offsetY = Math.floor(Math.random() * grid.length);
+    const offsetY = Math.floor(Math.random() * sizeY);
+    const offsetX = Math.floor(Math.random() * sizeX);
 
     // Iterate through the grid
     for (let y = 0; y < grid.length; y++) {
         for (let x = 0; x < grid[y].length; x++) {
-            const position = { x: (x + offsetX) % grid[y].length, y: (y + offsetY) % grid.length };
+            // Offset the position circularly
+            // This prevents a bias towards the top left of the grid
+            const posX = (x + offsetX) % sizeX;
+            const posY = (y + offsetY) % sizeY;
 
+            // Get the valid directions for the current position
+            const position = { x: posX, y: posY };
             const validDirections = getValidDirections(grid, position, word);
 
+            // If there are valid directions, return a placement object
             if (validDirections.length > 0) {
                 return { position, directions: validDirections };
             }
